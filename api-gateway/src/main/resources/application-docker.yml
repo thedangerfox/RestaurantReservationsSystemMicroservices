@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: customer-service
+              uri: http://customer-service:8080
+              predicates:
+                - Path=/api/customers/**
+
+            - id: menu-item-service
+              uri: http://menu-item-service:8080
+              predicates:
+                - Path=/api/menu-item/**
+
+            - id: table-service
+              uri: http://table-service:8080
+              predicates:
+                - Path=/api/tables/**
+
+            - id: reservation-service
+              uri: http://reservation-service:8080
+              predicates:
+                - Path=/api/reservation/**
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: customer-service
+        url: http://localhost:8081/v3/api-docs
+      - name: menu-item-service
+        url: http://localhost:8082/v3/api-docs
+      - name: table-service
+        url: http://localhost:8083/v3/api-docs
+      - name: reservation-service
+        url: http://localhost:8084/v3/api-docs

@@ -1,0 +1,140 @@
+version: "3.9"
+
+services:
+  # ---------------- DATABASES ----------------
+  customers-db:
+    image: postgres:18.3
+    container_name: customers-db
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+    ports:
+      - "5433:5432"
+    volumes:
+      - customers_pg_data:/var/lib/postgresql
+
+  menu-item-db:
+    image: postgres:18.3
+    container_name: menu-item-db
+    environment:
+      POSTGRES_DB: menu-item_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+    ports:
+      - "5434:5432"
+    volumes:
+      - menu-item_pg_data:/var/lib/postgresql
+
+  table-db:
+    image: postgres:18.3
+    container_name: table-db
+    environment:
+      POSTGRES_DB: table_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+    ports:
+      - "5435:5432"
+    volumes:
+      - table_pg_data:/var/lib/postgresql
+
+  reservation-db:
+    image: postgres:18.3
+    container_name: reservation-db
+    environment:
+      POSTGRES_DB: reservation_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+    ports:
+      - "5436:5432"
+    volumes:
+      - reservation_pg_data:/var/lib/postgresql
+
+  # ---------------- SERVICES ----------------
+  customer-service:
+    build: ./customer-service
+    container_name: customer-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg
+      POSTGRES_HOST: customers-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: customers_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+      SERVER_PORT: 8080
+    depends_on:
+      - customers-db
+    ports:
+      - "8081:8080"
+
+  menu-service:
+    build: ./menu-service
+    container_name: menu-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg
+      POSTGRES_HOST: menu-item-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: menu-item_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+      SERVER_PORT: 8080
+    depends_on:
+      - menu-item-db
+    ports:
+      - "8082:8080"
+
+  table-service:
+    build: ./table-service
+    container_name: table-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg
+      POSTGRES_HOST: table-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: table_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+      SERVER_PORT: 8080
+    depends_on:
+      - table-db
+    ports:
+      - "8083:8080"
+
+  reservation-service:
+    build: ./reservation-service
+    container_name: reservation-service
+    environment:
+      SPRING_PROFILES_ACTIVE: pg,docker
+      POSTGRES_HOST: reservation-db
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: reservation_db
+      POSTGRES_USER: vrms
+      POSTGRES_PASSWORD: vrms
+      SERVER_PORT: 8080
+    depends_on:
+      - reservation-db
+      - customer-service      # ✅ FIXED
+      - menu-service
+      - table-service
+    ports:
+      - "8084:8080"
+
+  # ---------------- API GATEWAY ----------------
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 8080
+    depends_on:
+      - customer-service      # ✅ FIXED
+      - menu-service
+      - table-service
+      - reservation-service
+    ports:
+      - "8080:8080"
+
+volumes:
+  customers_pg_data:
+  menu-item_pg_data:
+  table_pg_data:
+  reservation_pg_data:

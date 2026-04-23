@@ -1,0 +1,7 @@
+services:
+  customer:
+    base-url: http://customer-service:8080
+  menu-item:
+    base-url: http://menu-item-service:8080
+  table:
+    base-url: http://table-service:8080

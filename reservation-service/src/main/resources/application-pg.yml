@@ -1,0 +1,11 @@
+spring:
+    datasource:
+        url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:reservation_db}
+        username: ${POSTGRES_USER:reservation}
+        password: ${POSTGRES_PASSWORD:reservation}
+
+    jpa:
+        database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+    flyway:
+        locations: classpath:db/migration-pg
