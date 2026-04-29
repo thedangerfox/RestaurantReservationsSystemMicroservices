@@ -6,7 +6,7 @@ services:
     image: postgres:18.3
     container_name: customers-db
     environment:
-      POSTGRES_DB: customer_db
+      POSTGRES_DB: customers_db
       POSTGRES_USER: vrms
       POSTGRES_PASSWORD: vrms
     ports:

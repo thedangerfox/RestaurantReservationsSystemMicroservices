@@ -1,148 +1,19 @@
 ﻿-- ================================
--- Flyway init schema for Reservation System
+-- CUSTOMER SERVICE DATABASE
+-- Owns ONLY the customers table
 -- ================================
--- H2-friendly SQL (same style as VRMS)
 
--- ================================
--- CUSTOMERS
--- ================================
 CREATE TABLE IF NOT EXISTS customers (
-                                         id BIGINT PRIMARY KEY,
+                                         id BIGSERIAL PRIMARY KEY,
                                          full_name VARCHAR(120) NOT NULL,
     phone VARCHAR(20),
     status VARCHAR(20) NOT NULL
     );
 
--- ================================
--- RESTAURANT TABLES
--- ================================
-CREATE TABLE IF NOT EXISTS restaurant_tables (
-                                                 id BIGINT PRIMARY KEY,
-                                                 table_number INT NOT NULL UNIQUE,
-                                                 capacity INT NOT NULL,
-                                                 status VARCHAR(20) NOT NULL
-    );
-
--- ================================
--- MENU ITEMS
--- ================================
-CREATE TABLE IF NOT EXISTS menu_items (
-                                          id BIGINT PRIMARY KEY,
-                                          name VARCHAR(120) NOT NULL,
-    price DECIMAL(10,2) NOT NULL,
-    status VARCHAR(20) NOT NULL
-    );
-
--- ================================
--- RESERVATIONS
--- ================================
-CREATE TABLE IF NOT EXISTS reservations (
-                                            id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                            customer_id BIGINT NOT NULL,
-                                            table_id BIGINT NOT NULL,
-                                            reservation_time TIMESTAMP NOT NULL,
-                                            party_size INT NOT NULL,
-                                            status VARCHAR(20) NOT NULL,
-
-    CONSTRAINT fk_res_customer
-    FOREIGN KEY (customer_id) REFERENCES customers(id),
-
-    CONSTRAINT fk_res_table
-    FOREIGN KEY (table_id) REFERENCES restaurant_tables(id)
-    );
-
-CREATE INDEX IF NOT EXISTS idx_res_customer_id ON reservations(customer_id);
-CREATE INDEX IF NOT EXISTS idx_res_table_id ON reservations(table_id);
-
--- ================================
--- PRE-ORDER ITEMS
--- ================================
-CREATE TABLE IF NOT EXISTS pre_order_items (
-                                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                               reservation_id BIGINT NOT NULL,
-                                               item_id BIGINT NOT NULL,
-                                               quantity INT NOT NULL,
-
-                                               CONSTRAINT fk_preorder_reservation
-                                               FOREIGN KEY (reservation_id) REFERENCES reservations(id),
-
-    CONSTRAINT fk_preorder_menu
-    FOREIGN KEY (item_id) REFERENCES menu_items(id)
-    );
-
-CREATE INDEX IF NOT EXISTS idx_preorder_reservation_id ON pre_order_items(reservation_id);
-
--- ================================
--- INSERT DUMMY CUSTOMERS
--- ================================
-INSERT INTO customers (id, full_name, phone, status) VALUES
-                                                         (1, 'John Smith', '514-555-1001', 'ACTIVE'),
-                                                         (2, 'Sarah Johnson', '514-555-1002', 'ACTIVE'),
-                                                         (3, 'Michael Brown', '514-555-1003', 'ACTIVE'),
-                                                         (4, 'Emily Davis', '514-555-1004', 'ACTIVE'),
-                                                         (5, 'David Wilson', '514-555-1005', 'ACTIVE'),
-                                                         (6, 'Laura Martinez', '514-555-1006', 'ACTIVE'),
-                                                         (7, 'James Anderson', '514-555-1007', 'ACTIVE'),
-                                                         (8, 'Olivia Taylor', '514-555-1008', 'ACTIVE'),
-                                                         (9, 'Daniel Thomas', '514-555-1009', 'ACTIVE'),
-                                                         (10,'Sophia Moore', '514-555-1010', 'ACTIVE');
-
--- ================================
--- INSERT DUMMY RESTAURANT TABLES
--- ================================
-INSERT INTO restaurant_tables (id, table_number, capacity, status) VALUES
-                                                                       (1, 1, 2, 'AVAILABLE'),
-                                                                       (2, 2, 2, 'AVAILABLE'),
-                                                                       (3, 3, 4, 'AVAILABLE'),
-                                                                       (4, 4, 4, 'AVAILABLE'),
-                                                                       (5, 5, 6, 'AVAILABLE'),
-                                                                       (6, 6, 6, 'AVAILABLE'),
-                                                                       (7, 7, 8, 'AVAILABLE'),
-                                                                       (8, 8, 8, 'AVAILABLE'),
-                                                                       (9, 9, 10, 'AVAILABLE'),
-                                                                       (10,10,10, 'AVAILABLE');
-
--- ================================
--- INSERT DUMMY MENU ITEMS
--- ================================
-INSERT INTO menu_items (id, name, price, status) VALUES
-                                                     (1, 'Margherita Pizza', 14.99, 'ACTIVE'),
-                                                     (2, 'Pepperoni Pizza', 15.99, 'ACTIVE'),
-                                                     (3, 'Caesar Salad', 9.99, 'ACTIVE'),
-                                                     (4, 'Greek Salad', 10.99, 'ACTIVE'),
-                                                     (5, 'Spaghetti Bolognese', 16.99, 'ACTIVE'),
-                                                     (6, 'Lasagna', 17.99, 'ACTIVE'),
-                                                     (7, 'Chicken Alfredo', 18.99, 'ACTIVE'),
-                                                     (8, 'Garlic Bread', 5.99, 'ACTIVE'),
-                                                     (9, 'Tiramisu', 7.99, 'ACTIVE'),
-                                                     (10,'Cheesecake', 8.99, 'ACTIVE');
-
--- ================================
--- INSERT DUMMY RESERVATIONS
--- ================================
-INSERT INTO reservations (id, customer_id, table_id, reservation_time, party_size, status) VALUES
-                                                                                               (1, 1, 1, TIMESTAMP '2026-05-01 18:00:00', 2, 'PENDING'),
-                                                                                               (2, 2, 2, TIMESTAMP '2026-05-01 19:00:00', 2, 'PENDING'),
-                                                                                               (3, 3, 3, TIMESTAMP '2026-05-02 18:30:00', 4, 'PENDING'),
-                                                                                               (4, 4, 4, TIMESTAMP '2026-05-02 19:30:00', 4, 'PENDING'),
-                                                                                               (5, 5, 5, TIMESTAMP '2026-05-03 18:00:00', 6, 'PENDING'),
-                                                                                               (6, 6, 6, TIMESTAMP '2026-05-03 19:00:00', 6, 'PENDING'),
-                                                                                               (7, 7, 7, TIMESTAMP '2026-05-04 18:00:00', 8, 'PENDING'),
-                                                                                               (8, 8, 8, TIMESTAMP '2026-05-04 19:00:00', 8, 'PENDING'),
-                                                                                               (9, 9, 9, TIMESTAMP '2026-05-05 18:00:00', 10, 'PENDING'),
-                                                                                               (10,10,10,TIMESTAMP '2026-05-05 19:00:00', 10, 'PENDING');
-
--- ================================
--- INSERT DUMMY PRE-ORDER ITEMS
--- ================================
-INSERT INTO pre_order_items (reservation_id, item_id, quantity) VALUES
-                                                                    (1, 1, 1),
-                                                                    (1, 8, 2),
-                                                                    (2, 2, 1),
-                                                                    (3, 3, 2),
-                                                                    (4, 5, 1),
-                                                                    (5, 6, 2),
-                                                                    (6, 7, 1),
-                                                                    (7, 1, 3),
-                                                                    (8, 9, 2),
-                                                                    (9, 10,1);
+-- Dummy data
+INSERT INTO customers (full_name, phone, status) VALUES
+                                                     ('John Smith', '514-555-1001', 'ACTIVE'),
+                                                     ('Sarah Johnson', '514-555-1002', 'ACTIVE'),
+                                                     ('Michael Brown', '514-555-1003', 'ACTIVE'),
+                                                     ('Emily Davis', '514-555-1004', 'ACTIVE'),
+                                                     ('David Wilson', '514-555-1005', 'ACTIVE');
