@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:reservation-test-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: 0
+
+services:
+  customers:
+    base-url: http://localhost:9991
+  menu-items:
+    base-url: http://localhost:9992
+  tables:
+    base-url: http://localhost:9993
+
