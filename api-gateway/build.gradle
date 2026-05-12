@@ -19,15 +19,16 @@ repositories {
 }
 
 ext {
-	set('springCloudVersion', "2025.1.1")
+	set('springCloudVersion', "2025.1.0")
 }
 
 dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.2'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:3.0.3'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
@@ -42,6 +43,7 @@ tasks.named('test') {
 	testLogging {
 		events "passed", "skipped", "failed"
 	}
+	finalizedBy jacocoTestReport
 }
 
 jacoco {
@@ -51,8 +53,14 @@ jacoco {
 jacocoTestReport {
 	dependsOn test
 	reports {
-		xml.required.set(true)
-		csv.required.set(false)
-		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+		html.required = true
+		xml.required = true
+	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, excludes: [
+				'**/ApiGatewayApplication.*'
+			])
+		}))
 	}
 }

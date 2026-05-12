@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:reservation-test-db
+    url: jdbc:h2:mem:reservation-test-db;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -8,10 +8,10 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
 
   flyway:
-    enabled: true
+    enabled: false
     locations: classpath:db/migration
 
 server:
@@ -24,4 +24,10 @@ services:
     base-url: http://localhost:9992
   tables:
     base-url: http://localhost:9993
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
 
